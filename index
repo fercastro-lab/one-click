@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplazo — Registration Flow Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    :root {
+      --cyan: #4AC9E3;
+      --teal: #214345;
+      --brand-foam: #D6F5FA;
+      --brand-aqua: #18A8C0;
+      --brand-sea: #0C617A;
+      --brand-midnight: #0A2B2D;
+      --n-0: #FFFFFF;
+      --n-100: #EBEDF0;
+      --n-200: #D8DCE0;
+      --n-400: #8FA0AC;
+      --n-500: #5A6E7A;
+      --n-800: #2E343A;
+      --bg-base: #F2F4F6;
+      --bg-surface: #EBEDF0;
+      --bg-card: #FFFFFF;
+      --text-1: #060606;
+      --text-2: #2E343A;
+      --text-3: #7F8D98;
+      --border: #E2E5E8;
+      --red: #D41413;
+      --red-light: #FDEAEA;
+      --yellow: #B07800;
+      --yellow-light: #FFF3CC;
+      --green: #5AAD12;
+      --green-light: #EAF7D5;
+      --orange: #E07000;
+      --orange-light: #FFF0D9;
+      --sh-sm: 0 1px 4px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --sh-md: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--teal);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--sh-md);
+    }
+    nav .logo {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: -0.5px;
+    }
+    nav .logo span { color: white; }
+    nav .subtitle {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      font-weight: 400;
+      border-left: 1px solid rgba(255,255,255,0.2);
+      padding-left: 12px;
+      margin-left: 4px;
+    }
+    nav .updated {
+      margin-left: auto;
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      font-weight: 400;
+    }
+    nav .updated b { color: var(--cyan); font-weight: 600; }
+
+    /* MAIN */
+    main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+    .segment-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+    .badge-oneclick {
+      background: var(--brand-foam);
+      color: var(--brand-sea);
+    }
+    .badge-standard {
+      background: rgba(33,67,69,0.1);
+      color: var(--teal);
+    }
+
+    /* GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 900px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr; } }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--sh-sm);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .metric-card:hover {
+      border-color: var(--cyan);
+      box-shadow: var(--sh-md);
+    }
+    .metric-card .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .metric-card .label i { font-size: 13px; }
+    .metric-card .value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-1);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+    .metric-card .sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    /* COMPARATIVA */
+    .compare-section { margin-bottom: 40px; }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .compare-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--sh-sm);
+    }
+    .compare-card .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .compare-card .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-2);
+    }
+    .compare-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-row:last-child { border-bottom: none; }
+    .compare-row .name { font-size: 13px; color: var(--text-2); font-weight: 600; }
+    .compare-row .val  { font-size: 14px; font-weight: 700; color: var(--text-1); }
+
+    /* FRAUD TABLE */
+    .fraud-section { margin-bottom: 40px; }
+    .fraud-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--sh-sm);
+      overflow: hidden;
+    }
+    .fraud-card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .fraud-card-header .icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--red-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--red);
+      font-size: 16px;
+    }
+    .fraud-card-header h2 { font-size: 16px; font-weight: 700; color: var(--text-2); }
+    .fraud-card-header p  { font-size: 12px; color: var(--text-3); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(74,201,227,0.04); }
+    tbody td { padding: 12px 16px; color: var(--text-2); font-weight: 500; }
+    tbody td b { color: var(--text-1); font-weight: 700; }
+
+    .risk-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .risk-HIGH   { background: var(--red-light);    color: var(--red); }
+    .risk-MEDIUM { background: var(--yellow-light);  color: var(--yellow); }
+    .risk-LOW    { background: var(--green-light);   color: var(--green); }
+
+    /* LOADING */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      gap: 16px;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { font-size: 14px; color: var(--text-3); }
+
+    /* ERROR */
+    #error-msg {
+      display: none;
+      background: var(--red-light);
+      border: 1px solid var(--red);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: var(--red);
+      font-size: 13px;
+      margin: 32px 0;
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+    }
+
+    .empty {
+      padding: 32px;
+      text-align: center;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="logo">aplazo<span> ·</span></span>
+    <span class="subtitle">Registration Flow Dashboard</span>
+    <span class="updated" id="updated-label">Cargando...</span>
+  </nav>
+
+  <main>
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Cargando datos...</p>
+    </div>
+
+    <div id="error-msg"></div>
+
+    <div id="content" style="display:none">
+
+      <!-- ONE-CLICK -->
+      <div class="section-header">
+        <span class="section-label">Segmento</span>
+        <span class="segment-badge badge-oneclick"><i class="bi bi-lightning-charge-fill"></i> One-Click</span>
+      </div>
+      <div class="metrics-grid" id="grid-oneclick"></div>
+
+      <div class="divider"></div>
+
+      <!-- STANDARD -->
+      <div class="section-header">
+        <span class="section-label">Segmento</span>
+        <span class="segment-badge badge-standard"><i class="bi bi-person-check-fill"></i> Standard</span>
+      </div>
+      <div class="metrics-grid" id="grid-standard"></div>
+
+      <div class="divider"></div>
+
+      <!-- COMPARATIVA -->
+      <div class="compare-section">
+        <div class="section-header">
+          <span class="section-label">Comparativa</span>
+        </div>
+        <div class="compare-grid">
+          <div class="compare-card" id="compare-card"></div>
+          <div class="compare-card" id="dq-card"></div>
+        </div>
+      </div>
+
+      <!-- FRAUD -->
+      <div class="fraud-section">
+        <div class="section-header">
+          <span class="section-label">Fraud Indicators</span>
+        </div>
+        <div class="fraud-card">
+          <div class="fraud-card-header">
+            <div class="icon"><i class="bi bi-shield-exclamation"></i></div>
+            <div>
+              <h2>Merchants con señales de riesgo</h2>
+              <p>DQ rate > 15% — ordenados por riesgo descendente</p>
+            </div>
+          </div>
+          <div id="fraud-table-container"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Lee data.json del mismo repositorio
+    // GitHub Pages sirve los archivos estáticos automáticamente
+    const DATA_URL = "./data.json";
+
+    function fmt(n, type) {
+      if (n == null || isNaN(n)) return "—";
+      if (type === "currency") return "$" + n.toLocaleString("es-MX", { maximumFractionDigits: 0 });
+      if (type === "pct")      return (n * 100).toFixed(1) + "%";
+      if (type === "count")    return n.toLocaleString("es-MX");
+      return n;
+    }
+
+    function renderMetricCard(label, value, type, icon, sub) {
+      return `
+        <div class="metric-card">
+          <div class="label"><i class="bi ${icon}"></i> ${label}</div>
+          <div class="value">${fmt(value, type)}</div>
+          ${sub ? `<div class="sub">${sub}</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderSegment(gridId, data) {
+      const grid = document.getElementById(gridId);
+      grid.innerHTML = [
+        renderMetricCard("GMV",         data.gmv,           "currency", "bi-graph-up-arrow"),
+        renderMetricCard("Loans",        data.loans,         "count",    "bi-receipt"),
+        renderMetricCard("AOV",          data.aov,           "currency", "bi-tag"),
+        renderMetricCard("DQ rate DOB22",data.dq_rate_dob22, "pct",      "bi-exclamation-triangle", "Delinquency al día 22"),
+      ].join("");
+    }
+
+    function renderCompare(oneClick, standard) {
+      const card = document.getElementById("compare-card");
+      const metrics = [
+        { name: "GMV",   oc: fmt(oneClick.gmv, "currency"),   std: fmt(standard.gmv, "currency") },
+        { name: "Loans", oc: fmt(oneClick.loans, "count"),    std: fmt(standard.loans, "count") },
+        { name: "AOV",   oc: fmt(oneClick.aov, "currency"),   std: fmt(standard.aov, "currency") },
+      ];
+      card.innerHTML = `
+        <div class="card-header">
+          <span class="card-title">One-Click vs Standard</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-3);font-weight:600">Métrica</div>
+          <div style="font-size:11px;color:var(--brand-sea);font-weight:700;text-align:right">
+            <i class="bi bi-lightning-charge-fill"></i> One-Click
+          </div>
+          <div style="font-size:11px;color:var(--teal);font-weight:700;text-align:right">
+            <i class="bi bi-person-check-fill"></i> Standard
+          </div>
+        </div>
+        ${metrics.map(m => `
+          <div class="compare-row">
+            <span class="name">${m.name}</span>
+            <span class="val" style="color:var(--brand-sea)">${m.oc}</span>
+            <span class="val" style="color:var(--teal)">${m.std}</span>
+          </div>
+        `).join("")}
+      `;
+
+      const dqCard = document.getElementById("dq-card");
+      const dqOC  = (oneClick.dq_rate_dob22  * 100).toFixed(1);
+      const dqSTD = (standard.dq_rate_dob22 * 100).toFixed(1);
+      const higher = parseFloat(dqOC) >= parseFloat(dqSTD) ? "one_click" : "standard";
+      dqCard.innerHTML = `
+        <div class="card-header">
+          <span class="card-title">DQ Rate DOB22</span>
+          <span class="risk-badge ${parseFloat(dqOC) > 0.30 || parseFloat(dqSTD) > 0.30 ? 'risk-HIGH' : 'risk-LOW'}">
+            ${parseFloat(dqOC) > 0.30 || parseFloat(dqSTD) > 0.30 ? 'Atención' : 'Normal'}
+          </span>
+        </div>
+        <div style="display:flex; gap:16px; margin-bottom:16px;">
+          <div style="flex:1; background:var(--brand-foam); border-radius:12px; padding:16px; text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--brand-sea);margin-bottom:6px;">
+              <i class="bi bi-lightning-charge-fill"></i> One-Click
+            </div>
+            <div style="font-size:28px;font-weight:800;color:var(--brand-sea)">${dqOC}%</div>
+          </div>
+          <div style="flex:1; background:rgba(33,67,69,0.07); border-radius:12px; padding:16px; text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px;">
+              <i class="bi bi-person-check-fill"></i> Standard
+            </div>
+            <div style="font-size:28px;font-weight:800;color:var(--teal)">${dqSTD}%</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);">
+          ${higher === "one_click"
+            ? `One-Click tiene <b style="color:var(--red)">${(parseFloat(dqOC)-parseFloat(dqSTD)).toFixed(1)}pp más</b> de delinquency que Standard.`
+            : `Standard tiene <b style="color:var(--red)">${(parseFloat(dqSTD)-parseFloat(dqOC)).toFixed(1)}pp más</b> de delinquency que One-Click.`
+          }
+        </div>
+      `;
+    }
+
+    function renderFraudTable(flags) {
+      const container = document.getElementById("fraud-table-container");
+      if (!flags || flags.length === 0) {
+        container.innerHTML = `<div class="empty"><i class="bi bi-shield-check" style="font-size:24px;display:block;margin-bottom:8px;color:var(--green)"></i>Sin señales de riesgo detectadas</div>`;
+        return;
+      }
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Merchant ID</th>
+              <th>Loans</th>
+              <th>Clientes únicos</th>
+              <th>DQ Rate</th>
+              <th>Ticket prom.</th>
+              <th>% nuevos clientes</th>
+              <th>Riesgo</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${flags.map(f => `
+              <tr>
+                <td><b>${f.merchant_id}</b></td>
+                <td>${f.total_loans.toLocaleString("es-MX")}</td>
+                <td>${f.unique_customers.toLocaleString("es-MX")}</td>
+                <td><b style="color:${f.dq_rate_pct > 30 ? 'var(--red)' : 'var(--yellow)'}">${f.dq_rate_pct}%</b></td>
+                <td>$${f.avg_ticket.toLocaleString("es-MX", {maximumFractionDigits:0})}</td>
+                <td>${(f.new_customer_ratio * 100).toFixed(0)}%</td>
+                <td><span class="risk-badge risk-${f.fraud_risk_flag}">${f.fraud_risk_flag}</span></td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function loadData() {
+      try {
+        const resp = await fetch(DATA_URL + "?t=" + Date.now());
+        if (!resp.ok) throw new Error("No se pudo cargar data.json (HTTP " + resp.status + ")");
+        const data = await resp.json();
+
+        document.getElementById("updated-label").innerHTML =
+          "Actualizado: <b>" + new Date(data.updated_at).toLocaleString("es-MX") + "</b>";
+
+        renderSegment("grid-oneclick", data.one_click  || {});
+        renderSegment("grid-standard", data.standard   || {});
+        renderCompare(data.one_click || {}, data.standard || {});
+        renderFraudTable(data.fraud_flags || []);
+
+        document.getElementById("loading").style.display  = "none";
+        document.getElementById("content").style.display  = "block";
+
+      } catch (e) {
+        document.getElementById("loading").style.display = "none";
+        const err = document.getElementById("error-msg");
+        err.style.display = "block";
+        err.innerHTML = `<i class="bi bi-exclamation-circle"></i> <b>Error al cargar datos:</b> ${e.message}`;
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
