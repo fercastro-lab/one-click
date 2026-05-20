@@ -348,17 +348,23 @@ var MONTH_LABELS = {
 // LOAD DATA FROM GOOGLE SHEETS
 // ============================================================
 function loadData() {
-  var url = "https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec";
-
-  fetch(url)
-    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function(payload) {
-      initDashboard(payload);
-    })
-    .catch(function(err) {
-      showError("Could not load data.<br><b>Error:</b> " + err.message
-        + "<br><br>Make sure the Apps Script Web App is deployed with access: Anyone.");
-    });
+  // JSONP — the only method that works cross-origin with Apps Script
+  window._dashboardCallback = function(payload) {
+    initDashboard(payload);
+  };
+  window._dashboardError = function() {
+    showError("Could not load data from Apps Script.<br>Make sure the Web App is deployed with access: <b>Anyone</b>.");
+  };
+  var script = document.createElement('script');
+  script.src = "https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec?callback=_dashboardCallback";
+  script.onerror = window._dashboardError;
+  document.head.appendChild(script);
+  // Timeout fallback after 10s
+  setTimeout(function() {
+    if (document.getElementById('loading-state').style.display !== 'none') {
+      showError("Request timed out. Make sure the Apps Script Web App is deployed and syncDashboard has run.");
+    }
+  }, 10000);
 }
 
 function showError(msg) {
