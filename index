@@ -351,8 +351,14 @@ function loadData() {
   var url = "https://script.google.com/macros/s/AKfycbyYPmBWoqInA6CZs7vJuPdXQ2wHWWrIAvMOXLb3B6RSCK3pe9n4bCGx1zqOtekyhi6S/exec";
 
   fetch(url)
-    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function(payload) {
+    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+    .then(function(text) {
+      // HtmlService wraps output in HTML — extract just the JSON body
+      var match = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+      var json = match ? match[1].trim() : text.trim();
+      // Remove any HTML entities
+      json = json.replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+      var payload = JSON.parse(json);
       initDashboard(payload);
     })
     .catch(function(err) {
