@@ -1,539 +1,690 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aplazo — Registration Flow Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-  <style>
-    :root {
-      --cyan: #4AC9E3;
-      --teal: #214345;
-      --brand-foam: #D6F5FA;
-      --brand-aqua: #18A8C0;
-      --brand-sea: #0C617A;
-      --brand-midnight: #0A2B2D;
-      --n-0: #FFFFFF;
-      --n-100: #EBEDF0;
-      --n-200: #D8DCE0;
-      --n-400: #8FA0AC;
-      --n-500: #5A6E7A;
-      --n-800: #2E343A;
-      --bg-base: #F2F4F6;
-      --bg-surface: #EBEDF0;
-      --bg-card: #FFFFFF;
-      --text-1: #060606;
-      --text-2: #2E343A;
-      --text-3: #7F8D98;
-      --border: #E2E5E8;
-      --red: #D41413;
-      --red-light: #FDEAEA;
-      --yellow: #B07800;
-      --yellow-light: #FFF3CC;
-      --green: #5AAD12;
-      --green-light: #EAF7D5;
-      --orange: #E07000;
-      --orange-light: #FFF0D9;
-      --sh-sm: 0 1px 4px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-      --sh-md: 0 4px 16px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
-    }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aplazo — Registration Flow Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+<style>
+:root{
+  --cyan:#4AC9E3;--teal:#214345;--foam:#D6F5FA;--sea:#0C617A;
+  --red:#D41413;--red-l:#FDEAEA;--yellow:#B07800;--yellow-l:#FFF3CC;
+  --green:#5AAD12;--green-l:#EAF7D5;--orange:#E07000;--orange-l:#FFF0D9;
+  --bg:#F2F4F6;--surf:#EBEDF0;--card:#fff;
+  --t1:#060606;--t2:#2E343A;--t3:#7F8D98;--br:#E2E5E8;
+  --sh:0 1px 4px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh-md:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+  --font:'Manrope',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:var(--font);}
+body{background:var(--bg);}
+nav{background:var(--teal);height:56px;display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:50;box-shadow:var(--sh-md);}
+nav .sep{width:1px;height:20px;background:rgba(255,255,255,.2);}
+nav .sub{font-size:12px;color:rgba(255,255,255,.5);}
+nav .ts{margin-left:auto;font-size:11px;color:rgba(255,255,255,.4);}
+nav .ts b{color:var(--cyan);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);display:inline-block;margin-right:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+main{max-width:1200px;margin:0 auto;padding:28px 20px 48px;}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+/* LOADING / ERROR */
+#loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;gap:14px;}
+.spinner{width:36px;height:36px;border:3px solid var(--br);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading-state p{font-size:14px;color:var(--t3);}
+#error-state{display:none;background:var(--red-l);border:1px solid var(--red);border-radius:12px;padding:16px 20px;color:var(--red);font-size:13px;margin:32px 0;}
+#dashboard{display:none;}
 
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: var(--bg-base);
-      color: var(--text-1);
-      min-height: 100vh;
-    }
+.note-bar{background:#FFF3CC;border:1px solid #B07800;border-radius:12px;padding:10px 16px;font-size:12px;color:#7A5200;display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.divider{height:1px;background:var(--br);margin:20px 0;}
 
-    /* NAV */
-    nav {
-      background: var(--teal);
-      height: 56px;
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--sh-md);
-    }
-    nav .logo {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--cyan);
-      letter-spacing: -0.5px;
-    }
-    nav .logo span { color: white; }
-    nav .subtitle {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
-      font-weight: 400;
-      border-left: 1px solid rgba(255,255,255,0.2);
-      padding-left: 12px;
-      margin-left: 4px;
-    }
-    nav .updated {
-      margin-left: auto;
-      font-size: 11px;
-      color: rgba(255,255,255,0.45);
-      font-weight: 400;
-    }
-    nav .updated b { color: var(--cyan); font-weight: 600; }
+/* SEGMENT CARDS */
+.seg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.seg-card{background:var(--card);border:1px solid var(--br);border-radius:16px;overflow:hidden;box-shadow:var(--sh);}
+.seg-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--br);}
+.scount{font-size:11px;color:var(--t3);}
+.badge-oc{background:var(--foam);color:var(--sea);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.badge-std{background:rgba(33,67,69,.1);color:var(--teal);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);}
+.metric{padding:12px 14px;border-right:1px solid var(--br);}
+.metric:last-child{border-right:none;}
+.ml{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.mv{font-size:20px;font-weight:800;color:var(--t1);line-height:1.1;}
+.ms{font-size:10px;color:var(--t3);margin-top:2px;}
 
-    /* MAIN */
-    main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
+/* DQ LARGE */
+.dq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px;}
+.dq-box{background:var(--card);border:1px solid var(--br);border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:16px;box-shadow:var(--sh);}
+.dq-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.dq-box.oc .dq-icon{background:var(--foam);color:var(--sea);}
+.dq-box.std .dq-icon{background:rgba(33,67,69,.08);color:var(--teal);}
+.dq-lbl{font-size:11px;font-weight:600;color:var(--t2);margin-bottom:4px;}
+.dq-val{font-size:36px;font-weight:800;line-height:1;}
+.dq-box.oc .dq-val{color:var(--sea);}
+.dq-box.std .dq-val{color:var(--red);}
+.dq-sub{font-size:11px;color:var(--t3);margin-top:3px;}
+.dq-note{font-size:11px;color:var(--t3);text-align:center;margin-top:8px;margin-bottom:4px;}
+.dq-note b{color:var(--red);}
 
-    /* SECTION HEADER */
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .section-label {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--text-3);
-    }
-    .segment-badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 100px;
-    }
-    .badge-oneclick {
-      background: var(--brand-foam);
-      color: var(--brand-sea);
-    }
-    .badge-standard {
-      background: rgba(33,67,69,0.1);
-      color: var(--teal);
-    }
+/* MONTH SECTION */
+.month-section{background:var(--card);border:1px solid var(--br);border-radius:16px;overflow:hidden;box-shadow:var(--sh);margin-bottom:24px;}
+.month-header{padding:14px 18px;border-bottom:1px solid var(--br);}
+.month-header h3{font-size:13px;font-weight:800;color:var(--t2);}
+.month-header p{font-size:11px;color:var(--t3);margin-top:2px;}
+.month-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--br);}
+.mtab{font-size:12px;font-weight:600;padding:5px 14px;border-radius:100px;border:1px solid var(--br);background:var(--surf);color:var(--t2);cursor:pointer;transition:all .15s;}
+.mtab:hover{border-color:var(--cyan);}
+.mtab.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+.month-stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--br);}
+.mstat{padding:12px 16px;border-right:1px solid var(--br);}
+.mstat:last-child{border-right:none;}
+.msl{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;}
+.msv{font-size:18px;font-weight:800;color:var(--t1);}
+.mss{font-size:10px;color:var(--t3);margin-top:2px;}
+.month-merchants{padding:14px 18px;}
+.mm-title{font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.mm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;}
+.mm-chip{background:var(--surf);border:1px solid var(--br);border-radius:10px;padding:8px 12px;}
+.mc-name{font-weight:700;color:var(--t1);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mc-id{font-size:10px;color:var(--t3);margin-top:1px;}
+.mc-seg{font-size:10px;font-weight:600;margin-top:3px;}
+.mc-oc{color:var(--sea);}
+.mc-std{color:var(--teal);}
 
-    /* GRID */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-    @media (max-width: 900px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 500px) { .metrics-grid { grid-template-columns: 1fr; } }
+/* GMV AT RISK SUMMARY */
+.top-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:16px 18px;box-shadow:var(--sh);}
+.slbl{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.sval{font-size:22px;font-weight:800;}
+.ssub{font-size:11px;color:var(--t3);margin-top:3px;}
 
-    .metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: var(--sh-sm);
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .metric-card:hover {
-      border-color: var(--cyan);
-      box-shadow: var(--sh-md);
-    }
-    .metric-card .label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .metric-card .label i { font-size: 13px; }
-    .metric-card .value {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--text-1);
-      line-height: 1.1;
-      letter-spacing: -0.5px;
-    }
-    .metric-card .sub {
-      font-size: 12px;
-      color: var(--text-3);
-      margin-top: 4px;
-    }
+/* FILTER BAR */
+.fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:12px 16px;background:var(--card);border:1px solid var(--br);border-radius:14px;box-shadow:var(--sh);}
+.fbar label{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px;white-space:nowrap;}
+.fbar input,.fbar select{font-size:12px;height:32px;border-radius:10px;border:1px solid var(--br);background:var(--card);color:var(--t2);padding:0 10px;outline:none;font-family:var(--font);}
+.fbar input{min-width:160px;flex:1;}
+.fbar input:focus,.fbar select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(74,201,227,.15);}
+.sort-btn{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;border:1px solid var(--br);background:var(--surf);color:var(--t3);cursor:pointer;white-space:nowrap;font-family:var(--font);}
+.sort-btn.active{background:var(--card);border-color:var(--t2);color:var(--t1);}
+.fcount{margin-left:auto;font-size:11px;color:var(--t3);}
 
-    /* COMPARATIVA */
-    .compare-section { margin-bottom: 40px; }
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 700px) { .compare-grid { grid-template-columns: 1fr; } }
-
-    .compare-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: var(--sh-sm);
-    }
-    .compare-card .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .compare-card .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-2);
-    }
-    .compare-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .compare-row:last-child { border-bottom: none; }
-    .compare-row .name { font-size: 13px; color: var(--text-2); font-weight: 600; }
-    .compare-row .val  { font-size: 14px; font-weight: 700; color: var(--text-1); }
-
-    /* FRAUD TABLE */
-    .fraud-section { margin-bottom: 40px; }
-    .fraud-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--sh-sm);
-      overflow: hidden;
-    }
-    .fraud-card-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .fraud-card-header .icon {
-      width: 36px; height: 36px;
-      border-radius: 10px;
-      background: var(--red-light);
-      display: flex; align-items: center; justify-content: center;
-      color: var(--red);
-      font-size: 16px;
-    }
-    .fraud-card-header h2 { font-size: 16px; font-weight: 700; color: var(--text-2); }
-    .fraud-card-header p  { font-size: 12px; color: var(--text-3); }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    thead th {
-      padding: 12px 16px;
-      text-align: left;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      background: var(--bg-surface);
-      border-bottom: 1px solid var(--border);
-    }
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(74,201,227,0.04); }
-    tbody td { padding: 12px 16px; color: var(--text-2); font-weight: 500; }
-    tbody td b { color: var(--text-1); font-weight: 700; }
-
-    .risk-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .risk-HIGH   { background: var(--red-light);    color: var(--red); }
-    .risk-MEDIUM { background: var(--yellow-light);  color: var(--yellow); }
-    .risk-LOW    { background: var(--green-light);   color: var(--green); }
-
-    /* LOADING */
-    #loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 24px;
-      gap: 16px;
-    }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--cyan);
-      border-radius: 50%;
-      animation: spin 0.65s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loading p { font-size: 14px; color: var(--text-3); }
-
-    /* ERROR */
-    #error-msg {
-      display: none;
-      background: var(--red-light);
-      border: 1px solid var(--red);
-      border-radius: 12px;
-      padding: 16px 20px;
-      color: var(--red);
-      font-size: 13px;
-      margin: 32px 0;
-    }
-
-    /* DIVIDER */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 32px 0;
-    }
-
-    .empty {
-      padding: 32px;
-      text-align: center;
-      color: var(--text-3);
-      font-size: 13px;
-    }
-  </style>
+/* TABLE */
+.tcard{background:var(--card);border:1px solid var(--br);border-radius:16px;overflow:hidden;box-shadow:var(--sh);}
+.thead-info{padding:14px 18px;border-bottom:1px solid var(--br);}
+.thead-info h3{font-size:13px;font-weight:800;color:var(--t2);}
+.thead-info p{font-size:11px;color:var(--t3);margin-top:2px;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;background:var(--surf);border-bottom:1px solid var(--br);white-space:nowrap;cursor:pointer;user-select:none;}
+thead th:hover{color:var(--t2);}
+thead th.sorted{color:var(--t1);}
+tbody tr.dr{border-bottom:1px solid var(--br);cursor:pointer;transition:background .1s;}
+tbody tr.dr:hover{background:rgba(74,201,227,.04);}
+tbody tr.dr.hi{background:rgba(212,20,19,.025);}
+tbody td{padding:9px 12px;color:var(--t2);font-weight:500;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;}
+tbody td b{color:var(--t1);font-weight:800;}
+.mname{font-weight:700;color:var(--t1);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mid{font-size:10px;color:var(--t3);}
+.seg-oc{background:var(--foam);color:var(--sea);display:inline-flex;padding:2px 7px;border-radius:100px;font-size:10px;font-weight:700;}
+.seg-std{background:rgba(33,67,69,.1);color:var(--teal);display:inline-flex;padding:2px 7px;border-radius:100px;font-size:10px;font-weight:700;}
+.rbadge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:700;}
+.r-HIGH{background:var(--red-l);color:var(--red);}
+.r-MEDIUM{background:var(--yellow-l);color:var(--yellow);}
+.r-LOW{background:var(--green-l);color:var(--green);}
+.r-PENDING{background:var(--surf);color:var(--t3);}
+.bar-wrap{display:flex;align-items:center;gap:7px;}
+.bar-bg{flex:1;height:5px;background:var(--surf);border-radius:100px;overflow:hidden;min-width:50px;}
+.bar-fill{height:100%;border-radius:100px;}
+.bar-val{font-size:11px;font-weight:700;white-space:nowrap;}
+.xrow td{padding:0;background:rgba(248,252,253,.9);border-bottom:1px solid var(--br);}
+.xinner{padding:14px 18px;}
+.xtitle{font-size:12px;font-weight:800;color:var(--t1);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.xgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px;}
+.xstat{background:var(--surf);border-radius:10px;padding:8px 12px;}
+.xl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.xv{font-size:14px;font-weight:800;color:var(--t1);}
+.xv.danger{color:var(--red);}
+.xv.warn{color:var(--yellow);}
+.verdict{border-radius:10px;padding:11px 14px;font-size:12px;font-weight:600;line-height:1.65;border-left:3px solid;}
+.v-high{background:var(--red-l);color:#8B0000;border-color:var(--red);}
+.v-med{background:var(--yellow-l);color:#5A3E00;border-color:var(--yellow);}
+.v-low{background:var(--green-l);color:#2A5500;border-color:var(--green);}
+.v-pending{background:var(--surf);color:var(--t3);border-color:var(--br);}
+</style>
 </head>
 <body>
 
-  <nav>
-    <span class="logo">aplazo<span> ·</span></span>
-    <span class="subtitle">Registration Flow Dashboard</span>
-    <span class="updated" id="updated-label">Cargando...</span>
-  </nav>
+<nav>
+  <svg width="120" height="30" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#lc)">
+      <path d="M139.603 0H20.3966C9.13185 0 0 8.95338 0 19.9979V20.0021C0 31.0466 9.13185 40 20.3966 40H139.603C150.868 40 160 31.0466 160 20.0021V19.9979C160 8.95338 150.868 0 139.603 0Z" fill="#7FEDFA"/>
+      <path d="M136.943 17.1553C135.784 17.2377 133.141 17.5591 132.38 17.6662C131.641 13.6576 129.59 10.8066 126.598 10.135C120.501 8.76312 114.349 16.8093 110.143 31.645L113.286 32.5019C117.329 18.2471 122.623 12.5246 125.871 13.2538C127.359 13.5875 128.645 15.4126 129.17 18.2471C121.4 19.9981 119.787 23.3228 119.967 26.0378C120.114 28.2584 121.325 30.0877 123.283 31.06C125.262 32.0405 127.674 31.9581 129.422 30.8581C131.624 29.4738 131.96 27.4551 132.183 26.1202C132.611 23.0591 132.649 21.8108C131.422 21.988 130.296 22.2104 129.367 22.4535C129.313 23.3063 128.968 25.6011 128.968 25.6011C128.762 26.8453 128.598 27.5787 127.665 28.1637C126.892 28.6498 125.695 28.6663 124.753 28.2008C124.106 27.8794 123.312 27.2079 123.22 25.8236C123.094 23.9532 125.304 22.4329 129.422 21.4524C132.447 20.7685 137.259 20.3277 137.259 20.3277L136.943 17.1471Z" fill="#060606"/>
+      <path d="M99.7726 14.1354C96.0538 14.1354 93.0367 17.0935 93.0367 20.7396C93.0367 24.3857 96.0538 27.3437 99.7726 27.3437C103.491 27.3437 106.508 24.3857 106.508 20.7396C106.508 17.0935 103.491 14.1354 99.7726 14.1354ZM99.7726 24.4887C97.659 24.4887 95.9445 22.8077 95.9445 20.7354C95.9445 18.6631 97.659 16.9822 99.7726 16.9822C101.886 16.9822 103.601 18.6631 103.601 20.7354C103.601 22.8077 101.886 24.4887 99.7726 24.4887Z" fill="#060606"/>
+      <path d="M62.5175 8.18628H59.2946V26.8823H62.5175V8.18628Z" fill="#060606"/>
+      <path d="M37.234 14.3537V14.9676C36.2717 14.4444 35.175 14.1354 33.9942 14.1354C30.2755 14.1354 27.2584 17.0935 27.2584 20.7396C27.2584 24.3857 30.2755 27.3437 33.9942 27.3437C35.175 27.3437 36.2717 27.0347 37.234 26.5074V27.1213H40.4569V14.362H37.234V14.3537ZM33.9942 24.4887C31.8806 24.4887 30.1662 22.8077 30.1662 20.7354C30.1662 18.6631 31.8806 16.9822 33.9942 16.9822C36.1079 16.9822 37.8223 18.6631 37.8223 20.7354C37.8223 22.8077 36.1079 24.4887 33.9942 24.4887Z" fill="#060606"/>
+      <path d="M50.0375 14.1354C48.861 14.1354 47.76 14.4444 46.7978 14.9677V14.3538H43.5748V33.0787H46.7978V26.4992C47.7558 27.0266 48.8568 27.3356 50.0375 27.3356C53.7563 27.3356 56.7733 24.3775 56.7733 20.7314C56.7733 17.0853 53.7563 14.1272 50.0375 14.1272V14.1354ZM50.0375 24.4887C47.9239 24.4887 46.2095 22.8078 46.2095 20.7355C46.2095 18.6632 47.9239 16.9823 50.0375 16.9823C52.1511 16.9823 53.8656 18.6632 53.8656 20.7355C53.8656 22.8078 52.1511 24.4887 50.0375 24.4887Z" fill="#060606"/>
+      <path d="M92.2972 14.3167H80.5231V16.9616H87.322L80.271 27.146H91.9904V24.4969H85.2504L92.2972 14.3167Z" fill="#060606"/>
+      <path d="M75.0311 14.3537V14.9676C74.0689 14.4444 72.9721 14.1354 71.7914 14.1354C68.0726 14.1354 65.0555 17.0935 65.0555 20.7396C65.0555 24.3857 68.0726 27.3437 71.7914 27.3437C72.9721 27.3437 74.0689 27.0347 75.0311 26.5074V27.1213H78.2541V14.362H75.0311V14.3537ZM71.7914 24.4887C69.6778 24.4887 67.9633 22.8077 67.9633 20.7354C67.9633 18.6631 69.6778 16.9822 71.7914 16.9822C73.905 16.9822 75.6194 18.6631 75.6194 20.7354C75.6194 22.8077 73.905 24.4887 71.7914 24.4887Z" fill="#060606"/>
+    </g>
+    <defs><clipPath id="lc"><rect width="160" height="40" fill="white"/></clipPath></defs>
+  </svg>
+  <div class="sep"></div>
+  <span class="sub">Registration Flow Dashboard</span>
+  <span class="ts"><span class="dot"></span><b id="nav-updated">Loading...</b></span>
+</nav>
 
-  <main>
-    <div id="loading">
-      <div class="spinner"></div>
-      <p>Cargando datos...</p>
+<main>
+  <div id="loading-state">
+    <div class="spinner"></div>
+    <p>Loading live data...</p>
+  </div>
+  <div id="error-state"></div>
+  <div id="dashboard">
+
+    <div class="note-bar">
+      <i class="bi bi-info-circle-fill"></i>
+      <span><b>DQ note:</b> DOB22 has a 22-day natural delay — merchants activated after ~Apr 27 show "—". Click any merchant row to expand full fraud analysis.</span>
     </div>
 
-    <div id="error-msg"></div>
-
-    <div id="content" style="display:none">
-
-      <!-- ONE-CLICK -->
-      <div class="section-header">
-        <span class="section-label">Segmento</span>
-        <span class="segment-badge badge-oneclick"><i class="bi bi-lightning-charge-fill"></i> One-Click</span>
-      </div>
-      <div class="metrics-grid" id="grid-oneclick"></div>
-
-      <div class="divider"></div>
-
-      <!-- STANDARD -->
-      <div class="section-header">
-        <span class="section-label">Segmento</span>
-        <span class="segment-badge badge-standard"><i class="bi bi-person-check-fill"></i> Standard</span>
-      </div>
-      <div class="metrics-grid" id="grid-standard"></div>
-
-      <div class="divider"></div>
-
-      <!-- COMPARATIVA -->
-      <div class="compare-section">
-        <div class="section-header">
-          <span class="section-label">Comparativa</span>
+    <!-- SEGMENT CARDS -->
+    <div class="seg-grid">
+      <div class="seg-card">
+        <div class="seg-head">
+          <span class="badge-oc"><i class="bi bi-lightning-charge-fill"></i> One-Click</span>
+          <span class="scount" id="oc-count">— merchants</span>
         </div>
-        <div class="compare-grid">
-          <div class="compare-card" id="compare-card"></div>
-          <div class="compare-card" id="dq-card"></div>
+        <div class="metrics-row">
+          <div class="metric"><div class="ml">GMV</div><div class="mv" id="oc-gmv">—</div><div class="ms">MXN total</div></div>
+          <div class="metric"><div class="ml">Loans</div><div class="mv" id="oc-loans">—</div><div class="ms">originated</div></div>
+          <div class="metric"><div class="ml">AOV</div><div class="mv" id="oc-aov">—</div><div class="ms">avg. ticket</div></div>
         </div>
       </div>
-
-      <!-- FRAUD -->
-      <div class="fraud-section">
-        <div class="section-header">
-          <span class="section-label">Fraud Indicators</span>
+      <div class="seg-card">
+        <div class="seg-head">
+          <span class="badge-std"><i class="bi bi-person-check-fill"></i> Standard</span>
+          <span class="scount" id="std-count">— merchants</span>
         </div>
-        <div class="fraud-card">
-          <div class="fraud-card-header">
-            <div class="icon"><i class="bi bi-shield-exclamation"></i></div>
-            <div>
-              <h2>Merchants con señales de riesgo</h2>
-              <p>DQ rate > 15% — ordenados por riesgo descendente</p>
-            </div>
-          </div>
-          <div id="fraud-table-container"></div>
+        <div class="metrics-row">
+          <div class="metric"><div class="ml">GMV</div><div class="mv" id="std-gmv">—</div><div class="ms">MXN total</div></div>
+          <div class="metric"><div class="ml">Loans</div><div class="mv" id="std-loans">—</div><div class="ms">originated</div></div>
+          <div class="metric"><div class="ml">AOV</div><div class="mv" id="std-aov">—</div><div class="ms">avg. ticket</div></div>
         </div>
       </div>
-
     </div>
-  </main>
 
-  <script>
-    // Lee data.json del mismo repositorio
-    // GitHub Pages sirve los archivos estáticos automáticamente
-    const DATA_URL = "./data.json";
-
-    function fmt(n, type) {
-      if (n == null || isNaN(n)) return "—";
-      if (type === "currency") return "$" + n.toLocaleString("es-MX", { maximumFractionDigits: 0 });
-      if (type === "pct")      return (n * 100).toFixed(1) + "%";
-      if (type === "count")    return n.toLocaleString("es-MX");
-      return n;
-    }
-
-    function renderMetricCard(label, value, type, icon, sub) {
-      return `
-        <div class="metric-card">
-          <div class="label"><i class="bi ${icon}"></i> ${label}</div>
-          <div class="value">${fmt(value, type)}</div>
-          ${sub ? `<div class="sub">${sub}</div>` : ""}
+    <!-- DQ LARGE -->
+    <div class="dq-grid">
+      <div class="dq-box oc">
+        <div class="dq-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+        <div>
+          <div class="dq-lbl">One-Click · DQ DOB22</div>
+          <div class="dq-val" id="oc-dq">—</div>
+          <div class="dq-sub">mature loans only · ≥22 days old</div>
         </div>
-      `;
-    }
+      </div>
+      <div class="dq-box std">
+        <div class="dq-icon"><i class="bi bi-person-check-fill"></i></div>
+        <div>
+          <div class="dq-lbl">Standard · DQ DOB22</div>
+          <div class="dq-val" id="std-dq">—</div>
+          <div class="dq-sub">mature loans only · ≥22 days old</div>
+        </div>
+      </div>
+    </div>
+    <div class="dq-note" id="dq-diff-note">Calculating...</div>
 
-    function renderSegment(gridId, data) {
-      const grid = document.getElementById(gridId);
-      grid.innerHTML = [
-        renderMetricCard("GMV",         data.gmv,           "currency", "bi-graph-up-arrow"),
-        renderMetricCard("Loans",        data.loans,         "count",    "bi-receipt"),
-        renderMetricCard("AOV",          data.aov,           "currency", "bi-tag"),
-        renderMetricCard("DQ rate DOB22",data.dq_rate_dob22, "pct",      "bi-exclamation-triangle", "Delinquency al día 22"),
-      ].join("");
-    }
+    <div class="divider"></div>
 
-    function renderCompare(oneClick, standard) {
-      const card = document.getElementById("compare-card");
-      const metrics = [
-        { name: "GMV",   oc: fmt(oneClick.gmv, "currency"),   std: fmt(standard.gmv, "currency") },
-        { name: "Loans", oc: fmt(oneClick.loans, "count"),    std: fmt(standard.loans, "count") },
-        { name: "AOV",   oc: fmt(oneClick.aov, "currency"),   std: fmt(standard.aov, "currency") },
-      ];
-      card.innerHTML = `
-        <div class="card-header">
-          <span class="card-title">One-Click vs Standard</span>
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
-          <div style="font-size:11px;color:var(--text-3);font-weight:600">Métrica</div>
-          <div style="font-size:11px;color:var(--brand-sea);font-weight:700;text-align:right">
-            <i class="bi bi-lightning-charge-fill"></i> One-Click
-          </div>
-          <div style="font-size:11px;color:var(--teal);font-weight:700;text-align:right">
-            <i class="bi bi-person-check-fill"></i> Standard
-          </div>
-        </div>
-        ${metrics.map(m => `
-          <div class="compare-row">
-            <span class="name">${m.name}</span>
-            <span class="val" style="color:var(--brand-sea)">${m.oc}</span>
-            <span class="val" style="color:var(--teal)">${m.std}</span>
-          </div>
-        `).join("")}
-      `;
+    <!-- ACTIVATIONS BY MONTH -->
+    <div class="month-section">
+      <div class="month-header">
+        <h3>Merchant activations by month</h3>
+        <p>GMV by registration flow per month · click a month to filter the table below</p>
+      </div>
+      <div class="month-tabs" id="month-tabs"></div>
+      <div class="month-stats" id="month-stats"></div>
+      <div class="month-merchants" id="month-merchants"></div>
+    </div>
 
-      const dqCard = document.getElementById("dq-card");
-      const dqOC  = (oneClick.dq_rate_dob22  * 100).toFixed(1);
-      const dqSTD = (standard.dq_rate_dob22 * 100).toFixed(1);
-      const higher = parseFloat(dqOC) >= parseFloat(dqSTD) ? "one_click" : "standard";
-      dqCard.innerHTML = `
-        <div class="card-header">
-          <span class="card-title">DQ Rate DOB22</span>
-          <span class="risk-badge ${parseFloat(dqOC) > 0.30 || parseFloat(dqSTD) > 0.30 ? 'risk-HIGH' : 'risk-LOW'}">
-            ${parseFloat(dqOC) > 0.30 || parseFloat(dqSTD) > 0.30 ? 'Atención' : 'Normal'}
-          </span>
-        </div>
-        <div style="display:flex; gap:16px; margin-bottom:16px;">
-          <div style="flex:1; background:var(--brand-foam); border-radius:12px; padding:16px; text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:var(--brand-sea);margin-bottom:6px;">
-              <i class="bi bi-lightning-charge-fill"></i> One-Click
-            </div>
-            <div style="font-size:28px;font-weight:800;color:var(--brand-sea)">${dqOC}%</div>
-          </div>
-          <div style="flex:1; background:rgba(33,67,69,0.07); border-radius:12px; padding:16px; text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:var(--teal);margin-bottom:6px;">
-              <i class="bi bi-person-check-fill"></i> Standard
-            </div>
-            <div style="font-size:28px;font-weight:800;color:var(--teal)">${dqSTD}%</div>
-          </div>
-        </div>
-        <div style="font-size:12px;color:var(--text-3);">
-          ${higher === "one_click"
-            ? `One-Click tiene <b style="color:var(--red)">${(parseFloat(dqOC)-parseFloat(dqSTD)).toFixed(1)}pp más</b> de delinquency que Standard.`
-            : `Standard tiene <b style="color:var(--red)">${(parseFloat(dqSTD)-parseFloat(dqOC)).toFixed(1)}pp más</b> de delinquency que One-Click.`
-          }
-        </div>
-      `;
-    }
+    <!-- GMV AT RISK SUMMARY -->
+    <div class="top-stats">
+      <div class="stat-card">
+        <div class="slbl"><i class="bi bi-exclamation-triangle" style="color:var(--red)"></i> Confirmed GMV at risk</div>
+        <div class="sval" id="stat-confirmed" style="color:var(--red);">—</div>
+        <div class="ssub" id="stat-confirmed-sub">merchants with mature DQ</div>
+      </div>
+      <div class="stat-card">
+        <div class="slbl"><i class="bi bi-clock-history" style="color:var(--yellow)"></i> Pending exposure</div>
+        <div class="sval" id="stat-pending" style="color:var(--yellow);">—</div>
+        <div class="ssub">GMV from merchants &lt;22 days old</div>
+      </div>
+      <div class="stat-card">
+        <div class="slbl"><i class="bi bi-graph-up"></i> Total GMV · all merchants</div>
+        <div class="sval" id="stat-total">—</div>
+        <div class="ssub" id="stat-total-sub">all merchants</div>
+      </div>
+    </div>
 
-    function renderFraudTable(flags) {
-      const container = document.getElementById("fraud-table-container");
-      if (!flags || flags.length === 0) {
-        container.innerHTML = `<div class="empty"><i class="bi bi-shield-check" style="font-size:24px;display:block;margin-bottom:8px;color:var(--green)"></i>Sin señales de riesgo detectadas</div>`;
-        return;
-      }
-      container.innerHTML = `
+    <!-- FILTER BAR -->
+    <div class="fbar">
+      <label><i class="bi bi-search"></i></label>
+      <input type="text" id="q" placeholder="Search by name or ID..." oninput="renderTable()"/>
+      <label>Seg</label>
+      <select id="f-seg" onchange="renderTable()">
+        <option value="all">All</option>
+        <option value="one_click">One-Click</option>
+        <option value="standard">Standard</option>
+      </select>
+      <label>Show</label>
+      <select id="f-show" onchange="renderTable()">
+        <option value="all">All merchants</option>
+        <option value="risk">With DQ signal</option>
+        <option value="pending">DQ pending</option>
+      </select>
+      <label>Sort</label>
+      <button class="sort-btn active" id="btn-risk"  onclick="setSort('risk',this)">GMV at risk <i id="icon-risk" class="bi bi-sort-down"></i></button>
+      <button class="sort-btn"        id="btn-gmv"   onclick="setSort('gmv',this)">Total GMV <i id="icon-gmv" class="bi bi-arrow-down-up"></i></button>
+      <button class="sort-btn"        id="btn-dq"    onclick="setSort('dq',this)">DQ% <i id="icon-dq" class="bi bi-arrow-down-up"></i></button>
+      <button class="sort-btn"        id="btn-loans" onclick="setSort('loans',this)">Loans <i id="icon-loans" class="bi bi-arrow-down-up"></i></button>
+      <span class="fcount" id="fcount"></span>
+    </div>
+
+    <div class="tcard">
+      <div class="thead-info">
+        <h3>All merchants with activity — sorted by GMV at risk</h3>
+        <p>GMV at risk = Total GMV × DQ rate · click column headers to sort · click any row to expand fraud analysis</p>
+      </div>
+      <div style="overflow-x:auto">
         <table>
-          <thead>
-            <tr>
-              <th>Merchant ID</th>
-              <th>Loans</th>
-              <th>Clientes únicos</th>
-              <th>DQ Rate</th>
-              <th>Ticket prom.</th>
-              <th>% nuevos clientes</th>
-              <th>Riesgo</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${flags.map(f => `
-              <tr>
-                <td><b>${f.merchant_id}</b></td>
-                <td>${f.total_loans.toLocaleString("es-MX")}</td>
-                <td>${f.unique_customers.toLocaleString("es-MX")}</td>
-                <td><b style="color:${f.dq_rate_pct > 30 ? 'var(--red)' : 'var(--yellow)'}">${f.dq_rate_pct}%</b></td>
-                <td>$${f.avg_ticket.toLocaleString("es-MX", {maximumFractionDigits:0})}</td>
-                <td>${(f.new_customer_ratio * 100).toFixed(0)}%</td>
-                <td><span class="risk-badge risk-${f.fraud_risk_flag}">${f.fraud_risk_flag}</span></td>
-              </tr>
-            `).join("")}
-          </tbody>
+          <colgroup>
+            <col style="width:165px"/><col style="width:82px"/><col style="width:92px"/>
+            <col style="width:68px"/><col style="width:172px"/><col style="width:52px"/>
+            <col style="width:56px"/><col style="width:82px"/><col style="width:52px"/>
+            <col style="width:92px"/>
+          </colgroup>
+          <thead><tr>
+            <th onclick="setSort('name',null)">Merchant <i class="bi bi-arrow-down-up" id="th-icon-name" style="font-size:10px;opacity:.4"></i></th>
+            <th>Seg</th>
+            <th onclick="setSort('gmv',null)"   id="th-gmv">Total GMV <i class="bi bi-arrow-down-up" id="th-icon-gmv" style="font-size:10px;opacity:.4"></i></th>
+            <th onclick="setSort('dq',null)"    id="th-dq">DQ <i class="bi bi-arrow-down-up" id="th-icon-dq" style="font-size:10px;opacity:.4"></i></th>
+            <th onclick="setSort('risk',null)"  id="th-risk" class="sorted">GMV at risk <i class="bi bi-sort-down" id="th-icon-risk" style="font-size:10px;opacity:1"></i></th>
+            <th onclick="setSort('loans',null)" id="th-loans">Loans <i class="bi bi-arrow-down-up" id="th-icon-loans" style="font-size:10px;opacity:.4"></i></th>
+            <th>Cust.</th>
+            <th>Avg ticket</th>
+            <th>% new</th>
+            <th>Priority</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
         </table>
-      `;
-    }
+      </div>
+    </div>
 
-    async function loadData() {
-      try {
-        const resp = await fetch(DATA_URL + "?t=" + Date.now());
-        if (!resp.ok) throw new Error("No se pudo cargar data.json (HTTP " + resp.status + ")");
-        const data = await resp.json();
+  </div><!-- end #dashboard -->
+</main>
 
-        document.getElementById("updated-label").innerHTML =
-          "Actualizado: <b>" + new Date(data.updated_at).toLocaleString("es-MX") + "</b>";
+<script>
+// ============================================================
+// CONFIG — paste your Sheets CSV URL here after publishing
+// ============================================================
+var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/17Xw6qpviVfbUbdtSVf5Pw22xYOL8526omLNW-wRbtMw/gviz/tq?tqx=out:csv&range=A1";
 
-        renderSegment("grid-oneclick", data.one_click  || {});
-        renderSegment("grid-standard", data.standard   || {});
-        renderCompare(data.one_click || {}, data.standard || {});
-        renderFraudTable(data.fraud_flags || []);
+// ============================================================
+// STATE
+// ============================================================
+var DATA = [];
+var EXP  = {};
+var SORT = 'risk';
+var SORT_DIRS = {risk:false,gmv:false,dq:false,loans:false,name:true};
+var ACTIVE_MONTH = 'all';
+var MAX_RISK = 1;
+var MONTH_LABELS = {
+  '2026-04':'April 2026','2026-05':'May 2026','2026-06':'June 2026',
+  '2026-07':'July 2026','2026-08':'August 2026','2026-09':'September 2026',
+  '2026-10':'October 2026','2026-11':'November 2026','2026-12':'December 2026',
+  '2025-12':'December 2025','2025-11':'November 2025'
+};
 
-        document.getElementById("loading").style.display  = "none";
-        document.getElementById("content").style.display  = "block";
-
-      } catch (e) {
-        document.getElementById("loading").style.display = "none";
-        const err = document.getElementById("error-msg");
-        err.style.display = "block";
-        err.innerHTML = `<i class="bi bi-exclamation-circle"></i> <b>Error al cargar datos:</b> ${e.message}`;
+// ============================================================
+// LOAD DATA FROM GOOGLE SHEETS
+// ============================================================
+function loadData() {
+  fetch(SHEET_CSV_URL)
+    .then(function(r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.text();
+    })
+    .then(function(csv) {
+      // The CSV wraps the JSON in quotes and escapes inner quotes
+      // Strip surrounding quotes and unescape
+      var raw = csv.trim();
+      if (raw.charAt(0) === '"') {
+        raw = raw.slice(1, -1).replace(/""/g, '"');
       }
-    }
+      var payload = JSON.parse(raw);
+      initDashboard(payload);
+    })
+    .catch(function(err) {
+      showError("Could not load data from Google Sheets.<br><b>Error:</b> " + err.message
+        + "<br><br>Make sure the sheet is shared publicly (Anyone with the link → Viewer).");
+    });
+}
 
-    loadData();
-  </script>
+function showError(msg) {
+  document.getElementById('loading-state').style.display = 'none';
+  var el = document.getElementById('error-state');
+  el.style.display = 'block';
+  el.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> ' + msg;
+}
+
+// ============================================================
+// INIT — called once data loads
+// ============================================================
+function initDashboard(payload) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+
+  var d = new Date(payload.updated_at);
+  document.getElementById('nav-updated').textContent = 'Updated ' + d.toLocaleDateString('en-US', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  var oc  = payload.one_click  || {};
+  var std = payload.standard   || {};
+  DATA    = payload.fraud_flags || [];
+  var segs = payload.segments  || {oneClick:[],standard:[]};
+
+  // Segment cards
+  var ocCount  = (segs.oneClick  || []).length;
+  var stdCount = (segs.standard  || []).length;
+  var ocActive  = DATA.filter(function(r){return r.segment==='one_click';}).length;
+  var stdActive = DATA.filter(function(r){return r.segment==='standard';}).length;
+
+  document.getElementById('oc-count').textContent  = ocCount  + ' merchants · ' + ocActive  + ' with activity';
+  document.getElementById('std-count').textContent = stdCount + ' merchants · ' + stdActive + ' with activity';
+  document.getElementById('oc-gmv').textContent    = mxn(oc.gmv);
+  document.getElementById('oc-loans').textContent  = (oc.loans||0).toLocaleString('en-US');
+  document.getElementById('oc-aov').textContent    = mxn(oc.aov);
+  document.getElementById('std-gmv').textContent   = mxn(std.gmv);
+  document.getElementById('std-loans').textContent = (std.loans||0).toLocaleString('en-US');
+  document.getElementById('std-aov').textContent   = mxn(std.aov);
+
+  // DQ
+  var dqOC  = oc.dq_rate_dob22  != null ? (oc.dq_rate_dob22  * 100).toFixed(1) + '%' : '—';
+  var dqSTD = std.dq_rate_dob22 != null ? (std.dq_rate_dob22 * 100).toFixed(1) + '%' : '—';
+  document.getElementById('oc-dq').textContent  = dqOC;
+  document.getElementById('std-dq').textContent = dqSTD;
+  if (oc.dq_rate_dob22 != null && std.dq_rate_dob22 != null) {
+    var diff = Math.abs((std.dq_rate_dob22 - oc.dq_rate_dob22) * 100).toFixed(1);
+    var higher = std.dq_rate_dob22 >= oc.dq_rate_dob22 ? 'Standard' : 'One-Click';
+    document.getElementById('dq-diff-note').innerHTML = higher + ' has <b>+' + diff + 'pp</b> higher delinquency — DQ will stabilize as cohort matures.';
+  }
+
+  // GMV at risk summary
+  var confirmed = 0, pending = 0, total = 0, confirmedCount = 0;
+  DATA.forEach(function(r) {
+    total += (r.total_gmv || 0);
+    if (r.gmv_at_risk != null) { confirmed += (r.gmv_at_risk || 0); confirmedCount++; }
+    else pending += (r.total_gmv || 0);
+  });
+  MAX_RISK = Math.max(confirmed, 1);
+  document.getElementById('stat-confirmed').textContent     = mxn(confirmed) + ' MXN';
+  document.getElementById('stat-confirmed-sub').textContent = confirmedCount + ' merchants with mature DQ';
+  document.getElementById('stat-pending').textContent       = mxn(pending) + ' MXN';
+  document.getElementById('stat-total').textContent         = mxn(total) + ' MXN';
+  document.getElementById('stat-total-sub').textContent     = DATA.length + ' merchants · One-Click + Standard';
+
+  // Build month section using HubSpot activation dates
+  buildMonthSection(segs, DATA);
+
+  renderTable();
+}
+
+// ============================================================
+// MONTH SECTION
+// ============================================================
+function getMonth(d) { return d ? d.substring(0,7) : ''; }
+
+function buildMonthSection(segs, merchants) {
+  var months = {};
+
+  // Use HubSpot deal dates for activation month
+  var allSegs = (segs.oneClick||[]).concat(segs.standard||[]);
+  allSegs.forEach(function(s) {
+    var m = getMonth(s.date);
+    if (!m) return;
+    if (!months[m]) months[m] = {oc:[],std:[],gmv_oc:0,gmv_std:0,loans:0};
+    if (s.seg === 'one_click' || segs.oneClick.indexOf(s) >= 0) months[m].oc.push(s);
+    else months[m].std.push(s);
+  });
+
+  // Enrich with BigQuery GMV data
+  merchants.forEach(function(r) {
+    var m = getMonth(r.first_loan_date);
+    if (!m) return;
+    if (!months[m]) months[m] = {oc:[],std:[],gmv_oc:0,gmv_std:0,loans:0};
+    if (r.segment === 'one_click') months[m].gmv_oc += (r.total_gmv||0);
+    else months[m].gmv_std += (r.total_gmv||0);
+    months[m].loans += (r.total_loans||0);
+  });
+
+  var keys = Object.keys(months).sort().reverse(); // most recent first
+
+  // Build tabs
+  var tabsHtml = '<button class="mtab active" onclick="selectMonth(\'all\',this)">All time</button>';
+  keys.forEach(function(k) {
+    var total = months[k].oc.length + months[k].std.length;
+    tabsHtml += '<button class="mtab" onclick="selectMonth(\'' + k + '\',this)">' + (MONTH_LABELS[k]||k) + ' (' + total + ')</button>';
+  });
+  document.getElementById('month-tabs').innerHTML = tabsHtml;
+
+  window._MONTHS = months;
+  window._MONTH_KEYS = keys;
+  renderMonthView('all');
+}
+
+function selectMonth(key, btn) {
+  ACTIVE_MONTH = key;
+  document.querySelectorAll('.mtab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderMonthView(key);
+  renderTable();
+}
+
+function renderMonthView(key) {
+  var months = window._MONTHS || {};
+  var keys   = window._MONTH_KEYS || [];
+  var statsEl     = document.getElementById('month-stats');
+  var merchantsEl = document.getElementById('month-merchants');
+
+  if (key === 'all') {
+    var tOC=0,tStd=0,tGmvOC=0,tGmvStd=0,tLoans=0;
+    keys.forEach(function(k){
+      tOC+=months[k].oc.length; tStd+=months[k].std.length;
+      tGmvOC+=months[k].gmv_oc; tGmvStd+=months[k].gmv_std;
+      tLoans+=months[k].loans;
+    });
+    statsEl.innerHTML =
+      '<div class="mstat"><div class="msl">Total merchants</div><div class="msv">'+(tOC+tStd)+'</div><div class="mss">with activity</div></div>'+
+      '<div class="mstat"><div class="msl"><i class="bi bi-lightning-charge-fill" style="color:var(--sea)"></i> One-Click GMV</div><div class="msv" style="color:var(--sea)">$'+Math.round(tGmvOC).toLocaleString('en-US')+'</div><div class="mss">'+tOC+' merchants</div></div>'+
+      '<div class="mstat"><div class="msl"><i class="bi bi-person-check-fill" style="color:var(--teal)"></i> Standard GMV</div><div class="msv" style="color:var(--teal)">$'+Math.round(tGmvStd).toLocaleString('en-US')+'</div><div class="mss">'+tStd+' merchants</div></div>'+
+      '<div class="mstat"><div class="msl">Total GMV</div><div class="msv">$'+Math.round(tGmvOC+tGmvStd).toLocaleString('en-US')+'</div><div class="mss">MXN · '+tLoans+' loans</div></div>';
+    merchantsEl.innerHTML = '<div class="mm-title">Select a month to see GMV breakdown and merchant list</div>';
+    return;
+  }
+
+  var m = months[key];
+  if (!m) { statsEl.innerHTML=''; merchantsEl.innerHTML='<div style="padding:20px;color:var(--t3);font-size:13px;">No data</div>'; return; }
+  var total = m.oc.length + m.std.length;
+  var gmvTotal = m.gmv_oc + m.gmv_std;
+  var pctOC  = gmvTotal > 0 ? Math.round((m.gmv_oc /gmvTotal)*100) : 0;
+  var pctStd = gmvTotal > 0 ? Math.round((m.gmv_std/gmvTotal)*100) : 0;
+
+  statsEl.innerHTML =
+    '<div class="mstat"><div class="msl">Activated</div><div class="msv">'+total+'</div><div class="mss">'+(MONTH_LABELS[key]||key)+'</div></div>'+
+    '<div class="mstat"><div class="msl"><i class="bi bi-lightning-charge-fill" style="color:var(--sea)"></i> One-Click GMV</div><div class="msv" style="color:var(--sea)">$'+Math.round(m.gmv_oc).toLocaleString('en-US')+'</div><div class="mss">'+m.oc.length+' merchants · '+pctOC+'% of month</div></div>'+
+    '<div class="mstat"><div class="msl"><i class="bi bi-person-check-fill" style="color:var(--teal)"></i> Standard GMV</div><div class="msv" style="color:var(--teal)">$'+Math.round(m.gmv_std).toLocaleString('en-US')+'</div><div class="mss">'+m.std.length+' merchants · '+pctStd+'% of month</div></div>'+
+    '<div class="mstat"><div class="msl">Total GMV</div><div class="msv">$'+Math.round(gmvTotal).toLocaleString('en-US')+'</div><div class="mss">MXN · '+m.loans+' loans</div></div>';
+
+  // Mix bar
+  var bar = '<div style="margin:0 0 14px;padding:10px 14px;background:var(--surf);border-radius:12px;">'
+    + '<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">GMV mix</div>'
+    + '<div style="display:flex;height:8px;border-radius:100px;overflow:hidden;gap:2px;">'
+    + '<div style="width:'+pctOC+'%;background:var(--sea);border-radius:100px 0 0 100px;min-width:'+(m.gmv_oc>0?'4px':'0')+'"></div>'
+    + '<div style="width:'+pctStd+'%;background:var(--teal);border-radius:0 100px 100px 0;min-width:'+(m.gmv_std>0?'4px':'0')+'"></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:16px;margin-top:6px;font-size:11px;">'
+    + '<span style="color:var(--sea);font-weight:600;"><i class="bi bi-lightning-charge-fill"></i> One-Click '+pctOC+'%</span>'
+    + '<span style="color:var(--teal);font-weight:600;"><i class="bi bi-person-check-fill"></i> Standard '+pctStd+'%</span>'
+    + '</div></div>';
+
+  // Get merchant detail from DATA
+  var monthMerchants = DATA.filter(function(r){ return getMonth(r.first_loan_date) === key; });
+  var ocM   = monthMerchants.filter(function(r){return r.segment==='one_click';});
+  var stdM  = monthMerchants.filter(function(r){return r.segment==='standard';});
+
+  function chipList(arr) {
+    return arr.map(function(r){
+      var sc = r.segment==='one_click'?'mc-oc':'mc-std';
+      var sl = r.segment==='one_click'?'⚡ One-Click':'✓ Standard';
+      return '<div class="mm-chip"><div class="mc-name">'+r.merchant_name+'</div>'
+        +'<div class="mc-id">#'+r.merchant_id+' · $'+Math.round(r.total_gmv||0).toLocaleString('en-US')+'</div>'
+        +'<div class="mc-seg '+sc+'">'+sl+'</div></div>';
+    }).join('');
+  }
+
+  var sections = '';
+  if (ocM.length)  sections += '<div class="mm-title" style="color:var(--sea);margin-bottom:8px;"><i class="bi bi-lightning-charge-fill"></i> One-Click ('+ocM.length+')</div><div class="mm-grid" style="margin-bottom:16px;">'+chipList(ocM)+'</div>';
+  if (stdM.length) sections += '<div class="mm-title" style="color:var(--teal);margin-bottom:8px;"><i class="bi bi-person-check-fill"></i> Standard ('+stdM.length+')</div><div class="mm-grid">'+chipList(stdM)+'</div>';
+  if (!sections)   sections  = '<div style="font-size:12px;color:var(--t3);">No loan activity recorded for this month yet.</div>';
+
+  merchantsEl.innerHTML = bar + sections;
+}
+
+// ============================================================
+// TABLE
+// ============================================================
+function prio(r) {
+  if (r.dq_rate_pct === null) return 'PENDING';
+  if (r.gmv_at_risk >= 3000 || r.dq_rate_pct >= 50) return 'HIGH';
+  if (r.gmv_at_risk >= 500  || r.dq_rate_pct >= 20) return 'MEDIUM';
+  return 'LOW';
+}
+
+function getVerdict(r) {
+  var p    = prio(r);
+  var gmvS = mxn(r.total_gmv) + ' MXN';
+  var arS  = r.gmv_at_risk != null ? mxn(r.gmv_at_risk) + ' MXN' : 'unknown';
+  var dqS  = r.dq_rate_pct  != null ? r.dq_rate_pct + '%' : 'pending';
+  var today = new Date('2026-05-19');
+  var first = r.first_loan_date ? new Date(r.first_loan_date) : today;
+  var da   = Math.round((today - first) / 86400000);
+  var dl   = Math.max(0, 22 - da);
+
+  if (p==='HIGH')    return {cls:'v-high', txt:'🚨 High priority — Of '+gmvS+' originated, '+arS+' is predicted delinquent ('+dqS+' DQ). '+(r.new_customer_ratio>=0.9&&r.total_loans>=2?'All loans went to first-time customers — consistent with collusion or synthetic identity. ':'')+'Recommend immediate review and payment freeze.'};
+  if (p==='MEDIUM')  return {cls:'v-med',  txt:'⚡ Medium priority — '+arS+' at risk from '+dqS+' DQ on '+gmvS+'. '+(r.total_loans>=8&&r.unique_customers<=3?r.total_loans+' loans across only '+r.unique_customers+' customer(s) — loan concentration. ':'')+'Monitor over next 30 days.'};
+  if (p==='PENDING') return {cls:'v-pending',txt:'⏳ DQ pending — '+gmvS+' originated, '+da+' day(s) active, DOB22 ready in ~'+dl+' day(s). '+(r.total_gmv>=20000?'Large exposure — flag for priority review when DQ matures. ':'')+(r.new_customer_ratio>=1.0&&r.total_loans>=2?'100% new customer ratio on '+r.total_loans+' loans worth watching. ':'')+(r.avg_ticket>=10000?'Avg ticket '+mxn(r.avg_ticket)+' MXN is high for a new merchant. ':'')+'Re-evaluate at day 22.'};
+  return {cls:'v-low', txt:'✅ Clean — DQ '+dqS+' on '+gmvS+'. GMV at risk: $0. '+(r.total_loans>=8&&r.unique_customers<=3?'Note: '+r.total_loans+' loans to only '+r.unique_customers+' customers — monitor if volume grows. ':'')+'No fraud signals.'};
+}
+
+function mxn(n)  { return n == null ? '—' : '$' + Math.round(n).toLocaleString('en-US'); }
+function dqFmt(n){ if(n==null) return '<span style="font-size:10px;color:var(--t3)">—&lt;22d</span>'; var c=n>=40?'var(--red)':n>=20?'var(--yellow)':'var(--green)'; return '<b style="color:'+c+'">'+n+'%</b>'; }
+function barHTML(r){
+  if(r.gmv_at_risk==null) return '<span style="font-size:10px;color:var(--t3)">pending</span>';
+  if(r.gmv_at_risk===0)   return '<span style="font-size:11px;color:var(--green);font-weight:700;">$0 — clean</span>';
+  var pct=Math.min(100,Math.round((r.gmv_at_risk/MAX_RISK)*100));
+  var c=r.gmv_at_risk>=3000?'var(--red)':r.gmv_at_risk>=500?'var(--yellow)':'var(--orange)';
+  return '<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%;background:'+c+'"></div></div><span class="bar-val" style="color:'+c+'">'+mxn(r.gmv_at_risk)+'</span></div>';
+}
+
+function updateSortUI() {
+  ['risk','gmv','dq','loans'].forEach(function(k){
+    var btn=document.getElementById('btn-'+k), ico=document.getElementById('icon-'+k);
+    var th=document.getElementById('th-'+k), thico=document.getElementById('th-icon-'+k);
+    var active=SORT===k, dir=SORT_DIRS[k];
+    var cls=active?(dir?'bi bi-sort-up':'bi bi-sort-down'):'bi bi-arrow-down-up';
+    if(btn)btn.classList.toggle('active',active);
+    if(ico)ico.className=cls;
+    if(th)th.classList.toggle('sorted',active);
+    if(thico){thico.className=cls;thico.style.opacity=active?'1':'0.4';}
+  });
+  var ni=document.getElementById('th-icon-name');
+  if(ni){ni.className=(SORT==='name'?(SORT_DIRS.name?'bi bi-sort-up':'bi bi-sort-down'):'bi bi-arrow-down-up');ni.style.opacity=SORT==='name'?'1':'0.4';}
+}
+
+function setSort(key,btn) {
+  if(SORT===key) SORT_DIRS[key]=!SORT_DIRS[key]; else SORT=key;
+  updateSortUI(); renderTable();
+}
+
+function toggle(id) { EXP[id]=!EXP[id]; renderTable(); }
+
+function renderTable() {
+  var q    = (document.getElementById('q').value||'').toLowerCase().trim();
+  var seg  = document.getElementById('f-seg').value;
+  var show = document.getElementById('f-show').value;
+
+  var list = DATA.filter(function(r) {
+    if (q && !(r.merchant_name.toLowerCase().includes(q) || r.merchant_id.includes(q))) return false;
+    if (seg  !== 'all' && r.segment !== seg) return false;
+    if (show === 'risk'    && !(r.dq_rate_pct != null && r.gmv_at_risk > 0)) return false;
+    if (show === 'pending' && r.dq_rate_pct != null) return false;
+    if (ACTIVE_MONTH !== 'all' && getMonth(r.first_loan_date) !== ACTIVE_MONTH) return false;
+    return true;
+  });
+
+  var asc = SORT_DIRS[SORT];
+  list.sort(function(a,b) {
+    if (SORT==='name') { var av=a.merchant_name.toLowerCase(),bv=b.merchant_name.toLowerCase(); return asc?(av>bv?1:-1):(av<bv?1:-1); }
+    var av,bv;
+    if      (SORT==='gmv')   { av=a.total_gmv;    bv=b.total_gmv; }
+    else if (SORT==='dq')    { av=a.dq_rate_pct==null?-1:a.dq_rate_pct; bv=b.dq_rate_pct==null?-1:b.dq_rate_pct; }
+    else if (SORT==='loans') { av=a.total_loans;  bv=b.total_loans; }
+    else                     { av=a.gmv_at_risk==null?-1:a.gmv_at_risk; bv=b.gmv_at_risk==null?-1:b.gmv_at_risk; }
+    return asc?av-bv:bv-av;
+  });
+
+  document.getElementById('fcount').textContent = list.length + ' merchants';
+
+  var html = '';
+  list.forEach(function(r) {
+    var p=prio(r), pb='r-'+p, pl=p==='PENDING'?'⏳ Pending':p==='HIGH'?'🚨 High':p==='MEDIUM'?'⚡ Medium':'✅ Clean';
+    var sc=r.segment==='one_click'?'seg-oc':'seg-std', sl=r.segment==='one_click'?'One-Click':'Standard';
+    var exp=EXP[r.merchant_id], v=getVerdict(r);
+    html += '<tr class="dr'+(p==='HIGH'?' hi':'')+'" onclick="toggle(\''+r.merchant_id+'\')">';
+    html += '<td><div class="mname">'+r.merchant_name+' <i class="bi bi-chevron-'+(exp?'up':'down')+'" style="font-size:10px;color:var(--t3);"></i></div><div class="mid">#'+r.merchant_id+'</div></td>';
+    html += '<td><span class="'+sc+'">'+sl+'</span></td>';
+    html += '<td><b>'+mxn(r.total_gmv)+'</b></td>';
+    html += '<td>'+dqFmt(r.dq_rate_pct)+'</td>';
+    html += '<td>'+barHTML(r)+'</td>';
+    html += '<td>'+r.total_loans+'</td>';
+    html += '<td>'+r.unique_customers+'</td>';
+    html += '<td>'+mxn(r.avg_ticket)+'</td>';
+    html += '<td>'+Math.round((r.new_customer_ratio||0)*100)+'%</td>';
+    html += '<td><span class="rbadge '+pb+'">'+pl+'</span></td>';
+    html += '</tr>';
+    if (exp) {
+      html += '<tr class="xrow"><td colspan="10"><div class="xinner">';
+      html += '<div class="xtitle"><i class="bi bi-shield-exclamation"></i> Fraud analysis — '+r.merchant_name+' (#'+r.merchant_id+')</div>';
+      html += '<div class="xgrid">';
+      html += '<div class="xstat"><div class="xl">Total GMV</div><div class="xv">'+mxn(r.total_gmv)+' MXN</div></div>';
+      html += '<div class="xstat"><div class="xl">DQ rate DOB22</div><div class="xv '+(r.dq_rate_pct>=30?'danger':r.dq_rate_pct>=20?'warn':'')+'"> '+(r.dq_rate_pct!=null?r.dq_rate_pct+'%':'Pending — &lt;22 days')+'</div></div>';
+      html += '<div class="xstat"><div class="xl">GMV at risk</div><div class="xv '+(r.gmv_at_risk>=3000?'danger':r.gmv_at_risk>=500?'warn':'')+'"> '+(r.gmv_at_risk!=null?mxn(r.gmv_at_risk)+' MXN':'Pending')+'</div></div>';
+      html += '<div class="xstat"><div class="xl">Loans / customers</div><div class="xv">'+r.total_loans+' / '+r.unique_customers+'</div></div>';
+      html += '<div class="xstat"><div class="xl">Avg ticket</div><div class="xv '+(r.avg_ticket>=10000?'warn':'')+'">'+mxn(r.avg_ticket)+' MXN</div></div>';
+      html += '<div class="xstat"><div class="xl">% new customers</div><div class="xv '+(r.new_customer_ratio>=0.9&&r.total_loans>=2?'danger':r.new_customer_ratio>=0.7?'warn':'')+'"> '+Math.round((r.new_customer_ratio||0)*100)+'%</div></div>';
+      html += '<div class="xstat"><div class="xl">First loan</div><div class="xv" style="font-size:12px;">'+(r.first_loan_date||'—')+'</div></div>';
+      html += '<div class="xstat"><div class="xl">Last loan</div><div class="xv" style="font-size:12px;">'+(r.last_loan_date||'—')+'</div></div>';
+      html += '</div>';
+      html += '<div class="verdict '+v.cls+'">'+v.txt+'</div>';
+      html += '</div></td></tr>';
+    }
+  });
+
+  document.getElementById('tbody').innerHTML = html || '<tr><td colspan="10" style="padding:32px;text-align:center;color:var(--t3);">No merchants match this filter</td></tr>';
+}
+
+// ============================================================
+// KICK OFF
+// ============================================================
+loadData();
+</script>
 </body>
 </html>
