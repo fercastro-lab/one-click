@@ -150,24 +150,56 @@ tbody td b{color:var(--t1);font-weight:800;}
 .v-med{background:var(--yellow-l);color:#5A3E00;border-color:var(--yellow);}
 .v-low{background:var(--green-l);color:#2A5500;border-color:var(--green);}
 .v-pending{background:var(--surf);color:var(--t3);border-color:var(--br);}
+
+.nav-logo path { }
+nav svg.nav-logo { isolation: isolate; }
 </style>
 </head>
 <body>
 
+<!-- PASSWORD SCREEN -->
+<div id="lock-screen" style="position:fixed;inset:0;background:#214345;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:20px;">
+  
+  <div style="text-align:center;">
+    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px;letter-spacing:.5px;">Registration Flow Dashboard</div>
+    <input id="pwd-input" type="password" placeholder="Enter password"
+      style="width:260px;height:44px;border-radius:12px;border:none;padding:0 16px;font-size:14px;font-family:Manrope,sans-serif;outline:none;text-align:center;background:rgba(255,255,255,.1);color:#fff;letter-spacing:1px;"
+      onkeydown="if(event.key==='Enter')checkPwd()"/>
+    <br/>
+    <button onclick="checkPwd()"
+      style="margin-top:12px;width:260px;height:44px;border-radius:12px;border:none;background:#4AC9E3;color:#214345;font-size:14px;font-weight:800;font-family:Manrope,sans-serif;cursor:pointer;">
+      Enter
+    </button>
+    <div id="pwd-error" style="color:#ff6b6b;font-size:12px;margin-top:10px;display:none;">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<script>
+function checkPwd() {
+  var val = document.getElementById('pwd-input').value;
+  if (val === 'MerchantsAplazo') {
+    document.getElementById('lock-screen').style.display = 'none';
+    sessionStorage.setItem('dash_auth', '1');
+  } else {
+    var err = document.getElementById('pwd-error');
+    err.style.display = 'block';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+// Auto-unlock if already authenticated this session
+if (sessionStorage.getItem('dash_auth') === '1') {
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('lock-screen').style.display = 'none';
+  });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('pwd-input').focus();
+});
+</script>
+
 <nav>
-  <svg width="120" height="30" viewBox="0 0 160 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clip-path="url(#lc)">
-      <path d="M139.603 0H20.3966C9.13185 0 0 8.95338 0 19.9979V20.0021C0 31.0466 9.13185 40 20.3966 40H139.603C150.868 40 160 31.0466 160 20.0021V19.9979C160 8.95338 150.868 0 139.603 0Z" fill="#7FEDFA"/>
-      <path d="M136.943 17.1553C135.784 17.2377 133.141 17.5591 132.38 17.6662C131.641 13.6576 129.59 10.8066 126.598 10.135C120.501 8.76312 114.349 16.8093 110.143 31.645L113.286 32.5019C117.329 18.2471 122.623 12.5246 125.871 13.2538C127.359 13.5875 128.645 15.4126 129.17 18.2471C121.4 19.9981 119.787 23.3228 119.967 26.0378C120.114 28.2584 121.325 30.0877 123.283 31.06C125.262 32.0405 127.674 31.9581 129.422 30.8581C131.624 29.4738 131.96 27.4551 132.183 26.1202C132.611 23.0591 132.649 21.8108C131.422 21.988 130.296 22.2104 129.367 22.4535C129.313 23.3063 128.968 25.6011 128.968 25.6011C128.762 26.8453 128.598 27.5787 127.665 28.1637C126.892 28.6498 125.695 28.6663 124.753 28.2008C124.106 27.8794 123.312 27.2079 123.22 25.8236C123.094 23.9532 125.304 22.4329 129.422 21.4524C132.447 20.7685 137.259 20.3277 137.259 20.3277L136.943 17.1471Z" fill="#060606"/>
-      <path d="M99.7726 14.1354C96.0538 14.1354 93.0367 17.0935 93.0367 20.7396C93.0367 24.3857 96.0538 27.3437 99.7726 27.3437C103.491 27.3437 106.508 24.3857 106.508 20.7396C106.508 17.0935 103.491 14.1354 99.7726 14.1354ZM99.7726 24.4887C97.659 24.4887 95.9445 22.8077 95.9445 20.7354C95.9445 18.6631 97.659 16.9822 99.7726 16.9822C101.886 16.9822 103.601 18.6631 103.601 20.7354C103.601 22.8077 101.886 24.4887 99.7726 24.4887Z" fill="#060606"/>
-      <path d="M62.5175 8.18628H59.2946V26.8823H62.5175V8.18628Z" fill="#060606"/>
-      <path d="M37.234 14.3537V14.9676C36.2717 14.4444 35.175 14.1354 33.9942 14.1354C30.2755 14.1354 27.2584 17.0935 27.2584 20.7396C27.2584 24.3857 30.2755 27.3437 33.9942 27.3437C35.175 27.3437 36.2717 27.0347 37.234 26.5074V27.1213H40.4569V14.362H37.234V14.3537ZM33.9942 24.4887C31.8806 24.4887 30.1662 22.8077 30.1662 20.7354C30.1662 18.6631 31.8806 16.9822 33.9942 16.9822C36.1079 16.9822 37.8223 18.6631 37.8223 20.7354C37.8223 22.8077 36.1079 24.4887 33.9942 24.4887Z" fill="#060606"/>
-      <path d="M50.0375 14.1354C48.861 14.1354 47.76 14.4444 46.7978 14.9677V14.3538H43.5748V33.0787H46.7978V26.4992C47.7558 27.0266 48.8568 27.3356 50.0375 27.3356C53.7563 27.3356 56.7733 24.3775 56.7733 20.7314C56.7733 17.0853 53.7563 14.1272 50.0375 14.1272V14.1354ZM50.0375 24.4887C47.9239 24.4887 46.2095 22.8078 46.2095 20.7355C46.2095 18.6632 47.9239 16.9823 50.0375 16.9823C52.1511 16.9823 53.8656 18.6632 53.8656 20.7355C53.8656 22.8078 52.1511 24.4887 50.0375 24.4887Z" fill="#060606"/>
-      <path d="M92.2972 14.3167H80.5231V16.9616H87.322L80.271 27.146H91.9904V24.4969H85.2504L92.2972 14.3167Z" fill="#060606"/>
-      <path d="M75.0311 14.3537V14.9676C74.0689 14.4444 72.9721 14.1354 71.7914 14.1354C68.0726 14.1354 65.0555 17.0935 65.0555 20.7396C65.0555 24.3857 68.0726 27.3437 71.7914 27.3437C72.9721 27.3437 74.0689 27.0347 75.0311 26.5074V27.1213H78.2541V14.362H75.0311V14.3537ZM71.7914 24.4887C69.6778 24.4887 67.9633 22.8077 67.9633 20.7354C67.9633 18.6631 69.6778 16.9822 71.7914 16.9822C73.905 16.9822 75.6194 18.6631 75.6194 20.7354C75.6194 22.8077 73.905 24.4887 71.7914 24.4887Z" fill="#060606"/>
-    </g>
-    <defs><clipPath id="lc"><rect width="160" height="40" fill="white"/></clipPath></defs>
-  </svg>
+  
   <div class="sep"></div>
   <span class="sub">Registration Flow Dashboard</span>
   <span class="ts"><span class="dot"></span><b id="nav-updated">Loading...</b></span>
