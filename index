@@ -348,24 +348,27 @@ var MONTH_LABELS = {
 // LOAD DATA FROM GOOGLE SHEETS
 // ============================================================
 function loadData() {
-  fetch(SHEET_CSV_URL)
-    .then(function(r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.text();
-    })
+  var url = "https://docs.google.com/spreadsheets/d/17Xw6qpviVfbUbdtSVf5Pw22xYOL8526omLNW-wRbtMw/gviz/tq?tqx=out:csv&range=A1:A50";
+
+  fetch(url)
+    .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function(csv) {
-      // The CSV wraps the JSON in quotes and escapes inner quotes
-      // Strip surrounding quotes and unescape
-      var raw = csv.trim();
-      if (raw.charAt(0) === '"') {
-        raw = raw.slice(1, -1).replace(/""/g, '"');
+      var rows = csv.trim().split('\n');
+      var totalChunks = parseInt(rows[0].replace(/"/g, ''));
+      if (isNaN(totalChunks) || totalChunks < 1) throw new Error("No data in sheet yet. Run syncDashboard in Apps Script first.");
+
+      var jsonString = '';
+      for (var i = 1; i <= totalChunks; i++) {
+        var part = (rows[i] || '').replace(/^"|"$/g, '').replace(/""/g, '"');
+        jsonString += part;
       }
-      var payload = JSON.parse(raw);
+      var payload = JSON.parse(jsonString);
       initDashboard(payload);
     })
     .catch(function(err) {
       showError("Could not load data from Google Sheets.<br><b>Error:</b> " + err.message
-        + "<br><br>Make sure the sheet is shared publicly (Anyone with the link → Viewer).");
+        + "<br><br>Make sure: (1) the sheet is shared publicly (Anyone with the link → Viewer), "
+        + "(2) you ran syncDashboard in Apps Script successfully.");
     });
 }
 
