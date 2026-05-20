@@ -396,7 +396,9 @@ function initDashboard(payload) {
 
   var oc  = payload.one_click  || {};
   var std = payload.standard   || {};
-  DATA    = payload.fraud_flags || [];
+  DATA    = (payload.fraud_flags || []).filter(function(r) {
+    return !r.first_loan_date || r.first_loan_date >= '2026-03-01';
+  });
   var segs = payload.segments  || {oneClick:[],standard:[]};
 
   // Segment cards
@@ -476,7 +478,7 @@ function buildMonthSection(segs, merchants) {
     months[m].loans += (r.total_loans||0);
   });
 
-  var keys = Object.keys(months).sort().reverse(); // most recent first
+  var keys = Object.keys(months).filter(function(k){ return k >= '2026-03'; }).sort().reverse(); // March 2026 onwards
 
   // Build tabs
   var tabsHtml = '<button class="mtab active" onclick="selectMonth(\'all\',this)">All time</button>';
