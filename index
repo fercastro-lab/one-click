@@ -348,37 +348,34 @@ var MONTH_LABELS = {
 // LOAD DATA FROM GOOGLE SHEETS
 // ============================================================
 function loadData() {
-  var url = "https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec";
-  fetch(url)
-    .then(function(r) {
-      return r.text();
-    })
-    .then(function(text) {
-      var payload;
-      try {
-        payload = JSON.parse(text);
-      } catch(e) {
-        showError("JSON parse failed.<br><b>Raw response:</b><br><pre style='font-size:10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;'>" + text.substring(0, 500) + "</pre>");
-        return;
-      }
+  // Remove any previous JSONP script tag
+  var old = document.getElementById('jsonp-script');
+  if (old) old.remove();
+
+  window.__dashCB = function(payload) {
+    try {
       initDashboard(payload);
-    })
-    .catch(function(err) {
-      // fetch itself failed — likely CORS. Fall back to JSONP.
-      window._dashboardCallback = function(payload) { initDashboard(payload); };
-      var script = document.createElement('script');
-      script.src = url + "?callback=_dashboardCallback";
-      script.onerror = function() {
-        showError("Could not load data. Both fetch and JSONP failed.<br>Check that the Apps Script Web App is deployed with access: <b>Anyone</b>.");
-      };
-      document.head.appendChild(script);
-      setTimeout(function() {
-        if (document.getElementById('loading-state').style.display !== 'none') {
-          showError("Request timed out after 10s.<br>Check Apps Script deployment and run syncDashboard first.");
-        }
-      }, 10000);
-    });
+    } catch(e) {
+      showError("Error rendering dashboard: " + e.message + "<br><pre style='font-size:10px;margin-top:6px;white-space:pre-wrap'>" + e.stack + "</pre>");
+    }
+  };
+
+  var script = document.createElement('script');
+  script.id  = 'jsonp-script';
+  script.src = 'https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec?callback=__dashCB';
+  script.onerror = function() {
+    showError("Could not load data — script load failed.<br>Make sure the Apps Script Web App is deployed with access: <b>Anyone</b> and syncDashboard has run at least once.");
+  };
+  document.head.appendChild(script);
+
+  // Timeout after 12s
+  setTimeout(function() {
+    if (document.getElementById('loading-state').style.display !== 'none') {
+      showError("Request timed out after 12s.<br>Open the Web App URL directly to check it returns JSON: <a href='https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec' target='_blank'>open</a>");
+    }
+  }, 12000);
 }
+
 
 function showError(msg) {
   document.getElementById('loading-state').style.display = 'none';
