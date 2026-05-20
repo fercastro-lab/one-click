@@ -348,23 +348,36 @@ var MONTH_LABELS = {
 // LOAD DATA FROM GOOGLE SHEETS
 // ============================================================
 function loadData() {
-  // JSONP — the only method that works cross-origin with Apps Script
-  window._dashboardCallback = function(payload) {
-    initDashboard(payload);
-  };
-  window._dashboardError = function() {
-    showError("Could not load data from Apps Script.<br>Make sure the Web App is deployed with access: <b>Anyone</b>.");
-  };
-  var script = document.createElement('script');
-  script.src = "https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec?callback=_dashboardCallback";
-  script.onerror = window._dashboardError;
-  document.head.appendChild(script);
-  // Timeout fallback after 10s
-  setTimeout(function() {
-    if (document.getElementById('loading-state').style.display !== 'none') {
-      showError("Request timed out. Make sure the Apps Script Web App is deployed and syncDashboard has run.");
-    }
-  }, 10000);
+  var url = "https://script.google.com/macros/s/AKfycbzDLr4WpQoxJC5sXtje1ROVEphTBQaMNbL840nPPlzmIjeNumquJy8x0eaiHqcTleYc/exec";
+  fetch(url)
+    .then(function(r) {
+      return r.text();
+    })
+    .then(function(text) {
+      var payload;
+      try {
+        payload = JSON.parse(text);
+      } catch(e) {
+        showError("JSON parse failed.<br><b>Raw response:</b><br><pre style='font-size:10px;margin-top:6px;white-space:pre-wrap;word-break:break-all;'>" + text.substring(0, 500) + "</pre>");
+        return;
+      }
+      initDashboard(payload);
+    })
+    .catch(function(err) {
+      // fetch itself failed — likely CORS. Fall back to JSONP.
+      window._dashboardCallback = function(payload) { initDashboard(payload); };
+      var script = document.createElement('script');
+      script.src = url + "?callback=_dashboardCallback";
+      script.onerror = function() {
+        showError("Could not load data. Both fetch and JSONP failed.<br>Check that the Apps Script Web App is deployed with access: <b>Anyone</b>.");
+      };
+      document.head.appendChild(script);
+      setTimeout(function() {
+        if (document.getElementById('loading-state').style.display !== 'none') {
+          showError("Request timed out after 10s.<br>Check Apps Script deployment and run syncDashboard first.");
+        }
+      }, 10000);
+    });
 }
 
 function showError(msg) {
@@ -380,7 +393,7 @@ function showError(msg) {
 function initDashboard(payload) {
   document.getElementById('loading-state').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
-
+  try {
   var d = new Date(payload.updated_at);
   document.getElementById('nav-updated').textContent = 'Updated ' + d.toLocaleDateString('en-US', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
 
@@ -433,6 +446,9 @@ function initDashboard(payload) {
   buildMonthSection(segs, DATA);
 
   renderTable();
+  } catch(e) {
+    showError("Error rendering dashboard: " + e.message + "<br><pre style='font-size:10px;margin-top:8px;'>" + e.stack + "</pre>");
+  }
 }
 
 // ============================================================
